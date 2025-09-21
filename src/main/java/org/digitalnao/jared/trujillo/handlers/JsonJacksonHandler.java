@@ -1,6 +1,7 @@
 package org.digitalnao.jared.trujillo.handlers;
 
 import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
@@ -29,6 +30,16 @@ public class JsonJacksonHandler implements JsonHandler {
         try {
             CollectionType listType = mapper.getTypeFactory().constructCollectionType(List.class, type);
             return mapper.readValue(new File(filename), listType);
+        } catch(Exception e) {
+            throw this.handleException(e);
+        }
+    }
+
+    // Function for weird json data format
+    @Override
+    public <T> T fromJson(String filename, TypeReference<T> typeRef) throws JsonHandlerException {
+        try {
+            return mapper.readValue(new File(filename), typeRef);
         } catch(Exception e) {
             throw this.handleException(e);
         }
