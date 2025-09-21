@@ -26,7 +26,7 @@ public class CsvJacksonHandler implements CsvHandler {
             Files.writeString(Path.of(filename+".csv"), csv);
             System.out.println("CSV list generated successfully");
         } catch(Exception e) {
-            throw new CsvHandlerException("Csv list error", e);
+            throw this.handleException(e);
         }
     }
 
@@ -38,7 +38,7 @@ public class CsvJacksonHandler implements CsvHandler {
             Files.writeString(Path.of(filename+".csv"), csv);
             System.out.println("CSV list generated successfully");
         } catch(Exception e) {
-            throw new CsvHandlerException("Csv list error", e);
+            throw this.handleException(e);
         }
     }
 
@@ -52,7 +52,7 @@ public class CsvJacksonHandler implements CsvHandler {
             return new CsvHandlerException("CSV data doesn't match expected structure: ", e);
         }
         if (e instanceof JsonProcessingException) {
-            return new CsvHandlerException("CSV processing error: ", e);
+            return new CsvHandlerException("CSV processing error "+ message, e);
         }
 
         if (e instanceof FileNotFoundException) {
