@@ -12,10 +12,23 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-public class JsonJacksonHandler implements JsonHandler {
+/**
+ * JSON reader backed by Jackson with input validation and consistent exception mapping.
+ */
+final class JsonJacksonHandler implements JsonHandler {
 
     private final ObjectMapper mapper = new ObjectMapper();
 
+    /**
+     * Reads a JSON object from a file into the given type.
+     *
+     * @param <T>      target type
+     * @param filename path to the JSON file (expects {@code .json})
+     * @param type     target class (non-null)
+     * @return deserialized instance
+     * @throws JsonHandlerException if the filename is invalid, the file is missing/unreadable/empty,
+     *                              or parsing/mapping fails
+     */
     @Override
     public <T> T fromJson(String filename, Class<T> type) throws JsonHandlerException {
         this.validateFilename(filename);
@@ -23,11 +36,21 @@ public class JsonJacksonHandler implements JsonHandler {
         File file = this.validateFileInput(filename);
         try {
             return mapper.readValue(file, type);
-        } catch(Exception e) {
+        } catch (Exception e) {
             throw this.handleException(e);
         }
     }
 
+    /**
+     * Reads a JSON array from a file into a {@code List<T>}.
+     *
+     * @param <T>      element type
+     * @param filename path to the JSON file (expects {@code .json})
+     * @param type     element class (non-null)
+     * @return list of deserialized elements
+     * @throws JsonHandlerException if the filename is invalid, the file is missing/unreadable/empty,
+     *                              or content is not an array / mapping fails
+     */
     @Override
     public <T> List<T> fromJsonList(String filename, Class<T> type) throws JsonHandlerException {
         this.validateFilename(filename);
@@ -36,12 +59,22 @@ public class JsonJacksonHandler implements JsonHandler {
         try {
             CollectionType listType = mapper.getTypeFactory().constructCollectionType(List.class, type);
             return mapper.readValue(file, listType);
-        } catch(Exception e) {
+        } catch (Exception e) {
             throw this.handleException(e);
         }
     }
 
-    // Function for weird json data format
+    /**
+     * Reads JSON using a {@link TypeReference} for complex or generic types
+     * (e.g., {@code List<Map<String, Object>>}).
+     *
+     * @param <T>      target type inferred from {@code typeRef}
+     * @param filename path to the JSON file (expects {@code .json})
+     * @param typeRef  Jackson type reference (non-null)
+     * @return deserialized value
+     * @throws JsonHandlerException if the filename is invalid, the file is missing/unreadable/empty,
+     *                              or parsing/mapping fails
+     */
     @Override
     public <T> T fromJson(String filename, TypeReference<T> typeRef) throws JsonHandlerException {
         this.validateFilename(filename);
@@ -49,11 +82,10 @@ public class JsonJacksonHandler implements JsonHandler {
         File file = this.validateFileInput(filename);
         try {
             return mapper.readValue(file, typeRef);
-        } catch(Exception e) {
+        } catch (Exception e) {
             throw this.handleException(e);
         }
     }
-
 
     private JsonHandlerException handleException(Exception e) {
         if (e instanceof JsonParseException) {
@@ -63,9 +95,9 @@ public class JsonJacksonHandler implements JsonHandler {
             return new JsonHandlerException("JSON structure does not match ", e);
         }
         if (e instanceof IOException) {
-            return new JsonHandlerException("Could not read IOException" ,e);
+            return new JsonHandlerException("Could not read IOException", e);
         }
-        return new JsonHandlerException("Unknown error while deserializing " ,e);
+        return new JsonHandlerException("Unknown error while deserializing ", e);
     }
 
     private void validateFilename(String filename) {
@@ -103,8 +135,6 @@ public class JsonJacksonHandler implements JsonHandler {
         if (file.length() == 0) {
             throw new JsonHandlerException("The file is empty: " + filename);
         }
-
         return file;
     }
-
 }
