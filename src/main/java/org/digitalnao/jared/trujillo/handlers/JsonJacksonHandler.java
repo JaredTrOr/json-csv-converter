@@ -18,8 +18,11 @@ public class JsonJacksonHandler implements JsonHandler {
 
     @Override
     public <T> T fromJson(String filename, Class<T> type) throws JsonHandlerException {
+        this.validateFilename(filename);
+        this.validateType(type);
+        File file = this.validateFileInput(filename);
         try {
-            return mapper.readValue(new File(filename), type);
+            return mapper.readValue(file, type);
         } catch(Exception e) {
             throw this.handleException(e);
         }
@@ -27,9 +30,12 @@ public class JsonJacksonHandler implements JsonHandler {
 
     @Override
     public <T> List<T> fromJsonList(String filename, Class<T> type) throws JsonHandlerException {
+        this.validateFilename(filename);
+        this.validateType(type);
+        File file = this.validateFileInput(filename);
         try {
             CollectionType listType = mapper.getTypeFactory().constructCollectionType(List.class, type);
-            return mapper.readValue(new File(filename), listType);
+            return mapper.readValue(file, listType);
         } catch(Exception e) {
             throw this.handleException(e);
         }
@@ -38,8 +44,11 @@ public class JsonJacksonHandler implements JsonHandler {
     // Function for weird json data format
     @Override
     public <T> T fromJson(String filename, TypeReference<T> typeRef) throws JsonHandlerException {
+        this.validateFilename(filename);
+        this.validateTypeReference(typeRef);
+        File file = this.validateFileInput(filename);
         try {
-            return mapper.readValue(new File(filename), typeRef);
+            return mapper.readValue(file, typeRef);
         } catch(Exception e) {
             throw this.handleException(e);
         }
@@ -58,4 +67,44 @@ public class JsonJacksonHandler implements JsonHandler {
         }
         return new JsonHandlerException("Unknown error while deserializing " ,e);
     }
+
+    private void validateFilename(String filename) {
+        if (filename == null || filename.isBlank()) {
+            throw new JsonHandlerException("The filename cannot be null neither blank");
+        }
+        if (!filename.toLowerCase().endsWith(".json")) {
+            throw new JsonHandlerException("The filename needs to have the extension .json: " + filename);
+        }
+    }
+
+    private <T> void validateType(Class<T> type) {
+        if (type == null) {
+            throw new JsonHandlerException("The parameter 'type' cannot be null.");
+        }
+    }
+
+    private <T> void validateTypeReference(TypeReference<T> typeRef) {
+        if (typeRef == null) {
+            throw new JsonHandlerException("The parameter 'typeRef' cannot be null.");
+        }
+    }
+
+    private File validateFileInput(String filename) {
+        File file = new File(filename);
+        if (!file.exists()) {
+            throw new JsonHandlerException("File not found: " + filename);
+        }
+        if (!file.isFile()) {
+            throw new JsonHandlerException("The path is not a regular file: " + filename);
+        }
+        if (!file.canRead()) {
+            throw new JsonHandlerException("Read permission denied for file: " + filename);
+        }
+        if (file.length() == 0) {
+            throw new JsonHandlerException("The file is empty: " + filename);
+        }
+
+        return file;
+    }
+
 }
