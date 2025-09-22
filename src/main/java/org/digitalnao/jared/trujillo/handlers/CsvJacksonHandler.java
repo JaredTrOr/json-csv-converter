@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import org.digitalnao.jared.trujillo.exceptions.CsvHandlerException;
-import org.digitalnao.jared.trujillo.exceptions.JsonHandlerException;
 import org.digitalnao.jared.trujillo.interfaces.CsvHandler;
 
 import java.io.FileNotFoundException;
@@ -80,7 +79,7 @@ public class CsvJacksonHandler implements CsvHandler {
 
     private void validateFilename(String filename) {
         if (filename == null || filename.isBlank()) {
-            throw new JsonHandlerException("The filename cannot be null neither blank");
+            throw new CsvHandlerException("The filename cannot be null neither blank");
         }
     }
 
