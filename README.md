@@ -63,6 +63,19 @@ Key dependencies (declared in `pom.xml`):
 
 ---
 
+## 🚀 Quick Start
+
+```bash
+# Run unit tests
+mvn test
+
+# (Optional) Generate Javadocs
+mvn javadoc:javadoc
+# Open: target/site/apidocs/index.html
+```
+
+---
+
 ## 🔧 Usage
 
 Always use the **factories**; do not instantiate handlers directly.
@@ -93,10 +106,10 @@ public static void main(String[] args) {
                 new TypeReference<List<Map<String, Object>>>() {}
         );
     } catch(Exception e) {
-        System.err.println(e);
+        System.err.out(e);
     }
 }
-
+```
 ---
 
 ### Write CSV
@@ -122,9 +135,15 @@ public static void main(String[] args) {
                 new User(2, "Maria", "maria@example.com")
         ), User.class, "out/users");
     } catch(Exception e) {
-        System.err.println(e);
+        System.err.out(e);
     }  
 }
+
+```
+
+**Notes**  
+- The CSV writer creates `<filename>.csv` and includes a header row (ordered by `@JsonPropertyOrder` on `User`).  
+- On invalid inputs (null type/object/list, blank filename) or I/O errors, `CsvHandlerException` is thrown.
 
 ---
 
