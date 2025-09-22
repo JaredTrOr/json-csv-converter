@@ -63,19 +63,6 @@ Key dependencies (declared in `pom.xml`):
 
 ---
 
-## 🚀 Quick Start
-
-```bash
-# Run unit tests
-mvn test
-
-# (Optional) Generate Javadocs
-mvn javadoc:javadoc
-# Open: target/site/apidocs/index.html
-```
-
----
-
 ## 🔧 Usage
 
 Always use the **factories**; do not instantiate handlers directly.
@@ -110,11 +97,6 @@ public static void main(String[] args) {
     }
 }
 ```
-
-**Validation & errors**  
-- Filename must end with `.json`, file must exist, be readable, and non-empty.  
-- On failures, a `JsonHandlerException` is thrown (e.g., “Malformed JSON”, “JSON structure does not match”, etc.).
-
 ---
 
 ### Write CSV
@@ -145,11 +127,6 @@ public static void main(String[] args) {
 }
 
 ```
-
-**Notes**  
-- The CSV writer creates `<filename>.csv` and includes a header row (ordered by `@JsonPropertyOrder` on `User`).  
-- On invalid inputs (null type/object/list, blank filename) or I/O errors, `CsvHandlerException` is thrown.
-
 ---
 
 ## 🧪 Considerations
