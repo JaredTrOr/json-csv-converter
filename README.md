@@ -63,19 +63,6 @@ Key dependencies (declared in `pom.xml`):
 
 ---
 
-## 🚀 Quick Start
-
-```bash
-# Run unit tests
-mvn test
-
-# (Optional) Generate Javadocs
-mvn javadoc:javadoc
-# Open: target/site/apidocs/index.html
-```
-
----
-
 ## 🔧 Usage
 
 Always use the **factories**; do not instantiate handlers directly.
