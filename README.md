@@ -106,7 +106,7 @@ public static void main(String[] args) {
                 new TypeReference<List<Map<String, Object>>>() {}
         );
     } catch(Exception e) {
-        System.err.out(e);
+        System.err.println(e);
     }
 }
 ```
@@ -140,7 +140,7 @@ public static void main(String[] args) {
                 new User(2, "Maria", "maria@example.com")
         ), User.class, "out/users");
     } catch(Exception e) {
-        System.err.out(e);
+        System.err.println(e);
     }  
 }
 
