@@ -1,7 +1,6 @@
 package org.digitalnao.jared.trujillo.handlers;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import org.digitalnao.jared.trujillo.builders.JsonHandlerFactory;
 import org.digitalnao.jared.trujillo.classes.User;
 import org.digitalnao.jared.trujillo.exceptions.JsonHandlerException;
 import org.digitalnao.jared.trujillo.interfaces.JsonHandler;

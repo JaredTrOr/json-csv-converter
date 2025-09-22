@@ -14,10 +14,22 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
-public class CsvJacksonHandler implements CsvHandler {
+/**
+ * CSV writer backed by Jackson with basic input validation and exception mapping.
+ */
+final class CsvJacksonHandler implements CsvHandler {
 
     CsvMapper csvMapper = new CsvMapper();
 
+    /**
+     * Writes a single object to a CSV file with a header row.
+     *
+     * @param <T>      object type
+     * @param object   non-null instance to serialize
+     * @param type     class used to derive the CSV schema (non-null)
+     * @param filename base filename (the implementation appends {@code .csv})
+     * @throws CsvHandlerException if arguments are invalid, serialization fails, or an I/O error occurs
+     */
     @Override
     public <T> void writeToCsv(T object, Class<T> type, String filename) throws CsvHandlerException {
         validateFilename(filename);
@@ -34,6 +46,15 @@ public class CsvJacksonHandler implements CsvHandler {
         }
     }
 
+    /**
+     * Writes a list of objects to a CSV file with a header row.
+     *
+     * @param <T>      element type
+     * @param list     non-null, non-empty list of elements to serialize
+     * @param type     class used to derive the CSV schema (non-null)
+     * @param filename base filename (the implementation appends {@code .csv})
+     * @throws CsvHandlerException if arguments are invalid, serialization fails, or an I/O error occurs
+     */
     @Override
     public <T> void writeToCsv(List<T> list, Class<T> type, String filename) throws CsvHandlerException {
         validateFilename(filename);
@@ -60,7 +81,7 @@ public class CsvJacksonHandler implements CsvHandler {
             return new CsvHandlerException("CSV data doesn't match expected structure: ", e);
         }
         if (e instanceof JsonProcessingException) {
-            return new CsvHandlerException("CSV processing error "+ message, e);
+            return new CsvHandlerException("CSV processing error " + message, e);
         }
 
         if (e instanceof FileNotFoundException) {
@@ -79,7 +100,7 @@ public class CsvJacksonHandler implements CsvHandler {
 
     private void validateFilename(String filename) {
         if (filename == null || filename.isBlank()) {
-            throw new CsvHandlerException("The filename cannot be null neither blank");
+            throw new CsvHandlerException("The filename cannot be null nor blank");
         }
     }
 
