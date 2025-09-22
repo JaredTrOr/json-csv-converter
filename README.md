@@ -140,11 +140,6 @@ public static void main(String[] args) {
 }
 
 ```
-
-**Notes**  
-- The CSV writer creates `<filename>.csv` and includes a header row (ordered by `@JsonPropertyOrder` on `User`).  
-- On invalid inputs (null type/object/list, blank filename) or I/O errors, `CsvHandlerException` is thrown.
-
 ---
 
 ## 🧪 Considerations
