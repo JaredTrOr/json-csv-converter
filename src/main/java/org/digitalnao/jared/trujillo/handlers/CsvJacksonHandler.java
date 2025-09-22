@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import org.digitalnao.jared.trujillo.exceptions.CsvHandlerException;
+import org.digitalnao.jared.trujillo.exceptions.JsonHandlerException;
 import org.digitalnao.jared.trujillo.interfaces.CsvHandler;
 
 import java.io.FileNotFoundException;
@@ -20,24 +21,32 @@ public class CsvJacksonHandler implements CsvHandler {
 
     @Override
     public <T> void writeToCsv(T object, Class<T> type, String filename) throws CsvHandlerException {
+        validateFilename(filename);
+        validateType(type);
+        validateObject(object);
+
         try {
             CsvSchema schema = csvMapper.schemaFor(type).withHeader();
             String csv = csvMapper.writer(schema).writeValueAsString(object);
-            Files.writeString(Path.of(filename+".csv"), csv);
-            System.out.println("CSV list generated successfully");
-        } catch(Exception e) {
+            Files.writeString(Path.of(filename + ".csv"), csv);
+            System.out.println("CSV file generated successfully");
+        } catch (Exception e) {
             throw this.handleException(e);
         }
     }
 
     @Override
     public <T> void writeToCsv(List<T> list, Class<T> type, String filename) throws CsvHandlerException {
+        validateFilename(filename);
+        validateType(type);
+        validateList(list);
+
         try {
             CsvSchema schema = csvMapper.schemaFor(type).withHeader();
             String csv = csvMapper.writer(schema).writeValueAsString(list);
-            Files.writeString(Path.of(filename+".csv"), csv);
+            Files.writeString(Path.of(filename + ".csv"), csv);
             System.out.println("CSV list generated successfully");
-        } catch(Exception e) {
+        } catch (Exception e) {
             throw this.handleException(e);
         }
     }
@@ -67,5 +76,29 @@ public class CsvJacksonHandler implements CsvHandler {
         }
 
         return new CsvHandlerException("Unexpected error processing CSV: " + message, e);
+    }
+
+    private void validateFilename(String filename) {
+        if (filename == null || filename.isBlank()) {
+            throw new JsonHandlerException("The filename cannot be null neither blank");
+        }
+    }
+
+    private <T> void validateType(Class<T> type) {
+        if (type == null) {
+            throw new CsvHandlerException("The type parameter cannot be null.");
+        }
+    }
+
+    private <T> void validateObject(T object) {
+        if (object == null) {
+            throw new CsvHandlerException("The object to write cannot be null.");
+        }
+    }
+
+    private <T> void validateList(List<T> list) {
+        if (list == null || list.isEmpty()) {
+            throw new CsvHandlerException("The list cannot be null or empty.");
+        }
     }
 }
