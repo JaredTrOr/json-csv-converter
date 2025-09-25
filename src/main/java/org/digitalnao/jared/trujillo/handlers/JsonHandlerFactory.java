@@ -7,16 +7,9 @@ import org.digitalnao.jared.trujillo.interfaces.JsonHandler;
  */
 public final class JsonHandlerFactory {
 
-    private JsonHandlerFactory() {
-        // utility class; not meant to be instantiated
+
+    public static <T> JsonHandler createJsonHandler(JsonHandler jsonHandler) {
+        return jsonHandler;
     }
 
-    /**
-     * Creates a default JSON handler backed by Jackson.
-     *
-     * @return a new {@link JsonHandler} instance
-     */
-    public static JsonHandler createJsonHandler() {
-        return new JsonJacksonHandler();
-    }
 }

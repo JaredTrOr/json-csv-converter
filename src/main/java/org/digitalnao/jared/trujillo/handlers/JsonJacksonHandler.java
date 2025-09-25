@@ -2,6 +2,7 @@ package org.digitalnao.jared.trujillo.handlers;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
@@ -15,77 +16,44 @@ import java.util.List;
 /**
  * JSON reader backed by Jackson with input validation and consistent exception mapping.
  */
-final class JsonJacksonHandler implements JsonHandler {
+public class JsonJacksonHandler<T> implements JsonHandler {
 
     private final ObjectMapper mapper = new ObjectMapper();
+    private final JavaType javaType;
 
-    /**
-     * Reads a JSON object from a file into the given type.
-     *
-     * @param <T>      target type
-     * @param filename path to the JSON file (expects {@code .json})
-     * @param type     target class (non-null)
-     * @return deserialized instance
-     * @throws JsonHandlerException if the filename is invalid, the file is missing/unreadable/empty,
-     *                              or parsing/mapping fails
-     */
+    public JsonJacksonHandler(Class<T> type) {
+        this.javaType = mapper.getTypeFactory().constructType(type);
+    }
+
+    JsonJacksonHandler(TypeReference<T> typeRef) {
+        this.javaType = mapper.getTypeFactory().constructType(typeRef.getType());
+    }
+
     @Override
-    public <T> T fromJson(String filename, Class<T> type) throws JsonHandlerException {
+    public<K> K fromJson(String filename) throws JsonHandlerException {
         this.validateFilename(filename);
-        this.validateType(type);
+        this.validateType(this.javaType);
         File file = this.validateFileInput(filename);
         try {
-            return mapper.readValue(file, type);
+            return mapper.readValue(file, this.javaType);
         } catch (Exception e) {
             throw this.handleException(e);
         }
     }
 
-    /**
-     * Reads a JSON array from a file into a {@code List<T>}.
-     *
-     * @param <T>      element type
-     * @param filename path to the JSON file (expects {@code .json})
-     * @param type     element class (non-null)
-     * @return list of deserialized elements
-     * @throws JsonHandlerException if the filename is invalid, the file is missing/unreadable/empty,
-     *                              or content is not an array / mapping fails
-     */
     @Override
-    public <T> List<T> fromJsonList(String filename, Class<T> type) throws JsonHandlerException {
+    public <K> List<K> fromJsonList(String filename) throws JsonHandlerException {
         this.validateFilename(filename);
-        this.validateType(type);
+        this.validateType(this.javaType);
         File file = this.validateFileInput(filename);
         try {
-            CollectionType listType = mapper.getTypeFactory().constructCollectionType(List.class, type);
+            CollectionType listType = mapper.getTypeFactory().constructCollectionType(List.class, this.javaType);
             return mapper.readValue(file, listType);
         } catch (Exception e) {
             throw this.handleException(e);
         }
     }
 
-    /**
-     * Reads JSON using a {@link TypeReference} for complex or generic types
-     * (e.g., {@code List<Map<String, Object>>}).
-     *
-     * @param <T>      target type inferred from {@code typeRef}
-     * @param filename path to the JSON file (expects {@code .json})
-     * @param typeRef  Jackson type reference (non-null)
-     * @return deserialized value
-     * @throws JsonHandlerException if the filename is invalid, the file is missing/unreadable/empty,
-     *                              or parsing/mapping fails
-     */
-    @Override
-    public <T> T fromJson(String filename, TypeReference<T> typeRef) throws JsonHandlerException {
-        this.validateFilename(filename);
-        this.validateTypeReference(typeRef);
-        File file = this.validateFileInput(filename);
-        try {
-            return mapper.readValue(file, typeRef);
-        } catch (Exception e) {
-            throw this.handleException(e);
-        }
-    }
 
     private JsonHandlerException handleException(Exception e) {
         if (e instanceof JsonParseException) {
@@ -109,15 +77,9 @@ final class JsonJacksonHandler implements JsonHandler {
         }
     }
 
-    private <T> void validateType(Class<T> type) {
+    private void validateType(JavaType type) {
         if (type == null) {
             throw new JsonHandlerException("The parameter 'type' cannot be null.");
-        }
-    }
-
-    private <T> void validateTypeReference(TypeReference<T> typeRef) {
-        if (typeRef == null) {
-            throw new JsonHandlerException("The parameter 'typeRef' cannot be null.");
         }
     }
 
