@@ -45,4 +45,6 @@ public interface JsonHandler {
      *                              or parsing/mapping fails
      */
     <T> T fromJson(String filename, TypeReference<T> typeRef) throws JsonHandlerException;
+
+    boolean isJsonArray(String filename) throws JsonHandlerException;
 }
