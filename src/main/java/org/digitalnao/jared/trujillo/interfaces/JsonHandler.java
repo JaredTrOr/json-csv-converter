@@ -46,5 +46,12 @@ public interface JsonHandler {
      */
     <T> T fromJson(String filename, TypeReference<T> typeRef) throws JsonHandlerException;
 
+    /**
+     * Checks if a file is a JSON file of objects or an array
+     *
+     * @param filename the filename
+     * @return the boolean
+     * @throws JsonHandlerException the json handler exception
+     */
     boolean isJsonArray(String filename) throws JsonHandlerException;
 }
