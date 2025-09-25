@@ -3,6 +3,7 @@ package org.digitalnao.jared.trujillo.handlers;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
 import org.digitalnao.jared.trujillo.exceptions.JsonHandlerException;
@@ -42,29 +43,6 @@ final class JsonJacksonHandler implements JsonHandler {
     }
 
     /**
-     * Reads a JSON array from a file into a {@code List<T>}.
-     *
-     * @param <T>      element type
-     * @param filename path to the JSON file (expects {@code .json})
-     * @param type     element class (non-null)
-     * @return list of deserialized elements
-     * @throws JsonHandlerException if the filename is invalid, the file is missing/unreadable/empty,
-     *                              or content is not an array / mapping fails
-     */
-    @Override
-    public <T> List<T> fromJsonList(String filename, Class<T> type) throws JsonHandlerException {
-        this.validateFilename(filename);
-        this.validateType(type);
-        File file = this.validateFileInput(filename);
-        try {
-            CollectionType listType = mapper.getTypeFactory().constructCollectionType(List.class, type);
-            return mapper.readValue(file, listType);
-        } catch (Exception e) {
-            throw this.handleException(e);
-        }
-    }
-
-    /**
      * Reads JSON using a {@link TypeReference} for complex or generic types
      * (e.g., {@code List<Map<String, Object>>}).
      *
@@ -77,12 +55,45 @@ final class JsonJacksonHandler implements JsonHandler {
      */
     @Override
     public <T> T fromJson(String filename, TypeReference<T> typeRef) throws JsonHandlerException {
-        this.validateFilename(filename);
         this.validateTypeReference(typeRef);
         File file = this.validateFileInput(filename);
         try {
             return mapper.readValue(file, typeRef);
         } catch (Exception e) {
+            throw this.handleException(e);
+        }
+    }
+
+    /**
+     * Reads a JSON array from a file into a {@code List<T>}.
+     *
+     * @param <T>      element type
+     * @param filename path to the JSON file (expects {@code .json})
+     * @param type     element class (non-null)
+     * @return list of deserialized elements
+     * @throws JsonHandlerException if the filename is invalid, the file is missing/unreadable/empty,
+     *                              or content is not an array / mapping fails
+     */
+    @Override
+    public <T> List<T> fromJsonList(String filename, Class<T> type) throws JsonHandlerException {
+        this.validateType(type);
+        File file = this.validateFileInput(filename);
+        try {
+            CollectionType listType = mapper.getTypeFactory().constructCollectionType(List.class, type);
+            return mapper.readValue(file, listType);
+        } catch (Exception e) {
+            throw this.handleException(e);
+        }
+    }
+
+    @Override
+    public boolean isJsonArray(String filename) {
+        this.validateFilename(filename);
+
+        try {
+            JsonNode jsonNode = this.mapper.readTree(new File(filename));
+            return jsonNode.isArray();
+        } catch(Exception e) {
             throw this.handleException(e);
         }
     }
