@@ -69,7 +69,7 @@ Key dependencies (declared in `pom.xml`):
 
 Always use the **factories**; do not instantiate handlers directly.
 
-# Use of command-line
+## Use of command-line
 ```java
    import org.digitalnao.jared.trujillo.classes.Views;
 
