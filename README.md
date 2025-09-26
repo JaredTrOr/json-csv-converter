@@ -11,6 +11,7 @@ Includes strict **input validation**, **consistent exception mapping**, **unit t
 
 ## ✨ Features
 
+- Command-line menu to input proper data
 - JSON → `T`, `List<T>`, and complex types via `TypeReference<T>`
 - CSV ← single object or `List<T>` with a header row (ordered via `@JsonPropertyOrder`)
 - Consistent exceptions: `JsonHandlerException`, `CsvHandlerException`
@@ -39,6 +40,7 @@ src/
 │        │  ├─ JsonHandlerException.java
 │        │  └─ CsvHandlerException.java
 │        └─ classes/
+|           |- Views.java
 │           └─ User.java
 └─ test/
    └─ java/
@@ -66,6 +68,26 @@ Key dependencies (declared in `pom.xml`):
 ## 🔧 Usage
 
 Always use the **factories**; do not instantiate handlers directly.
+
+# Use of command-line
+```java
+   import org.digitalnao.jared.trujillo.classes.Views;
+
+public class Main {
+    public static void main(String[] args) {
+        Views views = new Views();
+        views.run(); // Starts interactive menu
+    }
+}
+```
+
+1.-Read JSON file - displays content in console
+
+2.-Read JSON file and convert to CSV - saves as CSV file
+
+3.-Exit
+
+The menu will prompt you for file paths and handle both single objects and arrays automatically.
 
 ### Read JSON
 
